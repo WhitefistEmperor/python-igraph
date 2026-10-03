@@ -7506,6 +7506,20 @@ PyObject *igraphmodule_Graph_list_triangles(igraphmodule_GraphObject *self, PyOb
   return res_o;
 }
 
+/** \ingroup python_interface_graph
+ * \brief Counts the triangles of the graph
+ * \sa igraph_count_triangles
+ */
+PyObject *igraphmodule_Graph_count_triangles(igraphmodule_GraphObject *self, PyObject* Py_UNUSED(_null)) {
+  igraph_real_t res;
+
+  if (igraph_count_triangles(&self->g, &res)) {
+    return igraphmodule_handle_igraph_error();
+  }
+
+  return PyLong_FromDouble(res);
+}
+
 typedef struct {
   PyObject* func;
   PyObject* graph;
@@ -17010,6 +17024,14 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "L{Graph}, which wraps the result in a L{TriadCensus} object.\n"
    "It is advised to use that. The name of the triplet classes are\n"
    "also documented there.\n\n"
+  },
+  {"count_triangles", (PyCFunction) igraphmodule_Graph_count_triangles,
+   METH_NOARGS,
+   "count_triangles()\n--\n\n"
+   "Counts the triangles of the graph without listing them.\n\n"
+   "Edge directions, multiple edges and self-loops are ignored.\n\n"
+   "@return: the total number of triangles as an integer.\n"
+   "@see: L{list_triangles}"
   },
   {"list_triangles", (PyCFunction) igraphmodule_Graph_list_triangles,
    METH_NOARGS,

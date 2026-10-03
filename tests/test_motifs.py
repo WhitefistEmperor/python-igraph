@@ -35,6 +35,33 @@ class MotifTests(unittest.TestCase):
 
 
 class TrianglesTests(unittest.TestCase):
+    def testCountTriangles(self):
+        for graph, expected in [
+            (Graph(), 0),
+            (Graph(5), 0),
+            (Graph.Tree(10, 2), 0),
+            (Graph.Ring(3), 1),
+            (Graph.Full(5), 10),
+            (Graph.Famous("petersen"), 0),
+            (Graph([(0, 1), (1, 2), (2, 0), (1, 3), (3, 2)]), 2),
+            (Graph.Full(3) + Graph.Full(3) + Graph(2), 2),
+        ]:
+            with self.subTest(edges=graph.get_edgelist()):
+                result = graph.count_triangles()
+                self.assertIsInstance(result, int)
+                self.assertEqual(result, expected)
+                self.assertEqual(result, len(graph.list_triangles()))
+
+    def testCountTrianglesIgnoresDirectionsMultiplicityAndLoops(self):
+        for directed in (False, True):
+            with self.subTest(directed=directed):
+                graph = Graph(
+                    [(0, 1), (1, 2), (0, 2), (1, 0), (0, 1), (0, 0), (2, 2)],
+                    directed=directed,
+                )
+                self.assertEqual(graph.count_triangles(), 1)
+                self.assertEqual(graph.count_triangles(), len(graph.list_triangles()))
+
     def testListTriangles(self):
         g = Graph.Famous("petersen")
         self.assertEqual([], g.list_triangles())
